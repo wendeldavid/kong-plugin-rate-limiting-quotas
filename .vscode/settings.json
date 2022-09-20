@@ -1,0 +1,11 @@
+{
+    "Lua.runtime.version": "LuaJIT",
+    "Lua.diagnostics.globals": [
+        "ngx",
+        "kong"
+    ],
+    "Lua.workspace.library": [
+        "${3rd}/OpenResty/library"
+    ],
+    "Lua.workspace.checkThirdParty": false
+}

@@ -15,31 +15,69 @@ end
 describe(PLUGIN_NAME .. ": (schema)", function()
 
 
-  it("accepts distinct request_header and response_header", function()
+  it("default values only", function()
     local ok, err = validate({
-        request_header = "My-Request-Header",
-        response_header = "Your-Response",
+        second = 10,
+        minute = 10,
+        hour = 10,
+        day = 10,
+        month = 10,
+        year = 10,
+        quotas = {}
+      })
+    assert.is_nil(err)
+    assert.is_truthy(ok)
+    print(err)
+  end)
+
+  it("tests with 1 quota config", function()
+    local ok, err = validate({
+        second = 10,
+        minute = 10,
+        hour = 10,
+        day = 10,
+        month = 10,
+        year = 10,
+        quotas = {
+          second = { "silver:10" , "gold:100" },
+        }
       })
     assert.is_nil(err)
     assert.is_truthy(ok)
   end)
 
-
-  it("does not accept identical request_header and response_header", function()
+  it("tests with multiples quota config", function()
     local ok, err = validate({
-        request_header = "they-are-the-same",
-        response_header = "they-are-the-same",
-      })
-
-    assert.is_same({
-      ["config"] = {
-        ["@entity"] = {
-          [1] = "values of these fields must be distinct: 'request_header', 'response_header'"
+        second = 10,
+        minute = 10,
+        hour = 10,
+        day = 10,
+        month = 10,
+        year = 10,
+        quotas = {
+          second = { "silver:10" , "gold:100" },
+          hour = { "silver:60" },
         }
-      }
-    }, err)
-    assert.is_falsy(ok)
+      })
+    assert.is_nil(err)
+    assert.is_truthy(ok)
   end)
+
+  -- it("does not accept identical request_header and response_header", function()
+  --   local ok, err = validate({
+  --       request_header = "they-are-the-same",
+  --       response_header = "they-are-the-same",
+  --     })
+
+  --   assert.is_same({
+  --     ["config"] = {
+  --       ["@entity"] = {
+  --         [1] = "values of these fields must be distinct: 'request_header', 'response_header'"
+  --       }
+  --     }
+  --   }, err)
+  --   assert.is_falsy(ok)
+  -- end)
 
 
 end)

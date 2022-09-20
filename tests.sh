@@ -1,4 +1,5 @@
 #!/bin/bash
 
-pongo run --no-cassandra
+pongo run --no-cassandra -v
 
+pongo down
