@@ -2,7 +2,6 @@
 local timestamp = require "kong.tools.timestamp"
 local policies = require "kong.plugins.rate-limiting-quotas.policies"
 local kong_meta = require "kong.meta"
-local groups = require "kong.plugins.acl.groups"
 
 
 local kong = kong
@@ -80,79 +79,28 @@ local function get_identifier(conf)
   return identifier or kong.client.get_forwarded_ip()
 end
 
-local function split_string (inputstr, sep)
-  if sep == nil then
-    sep = "%s"
-  end
-
-  local t={}
-  for str in string.gmatch(inputstr, "([^"..sep.."]+)") do
-          table.insert(t, str)
-  end
-
-  return t
-end
-
-
-local function get_quota_limit(conf, quota)
-  -- pega o consumer da requisição
-  local consumer = kong.client.get_consumer()
-  if not consumer then
-    return nil, error("no consumer found")
-  end
-
-  -- pega os groups do consumer...por convenção os planos ficariam aqui (ex: silver, gold)
-  local consumer_groups, err = groups.get_consumer_groups(consumer.id)
-  if err then
-    return nil, error(err)
-  end
-
-  -- for k, v in pairs(consumer_groups) do
-  --   kong.log.debug("======================== "..k)
-  -- end
-  for index, period_value in pairs(quota) do
-      local splitted = split_string(period_value, ":")
-      local plan = splitted[1]
-      local limit = splitted[2]
-
-      kong.log.debug("========================  plan: "..plan)
-      kong.log.debug("======================== limit: "..limit)
-
-      if consumer_groups[plan] ~= nil then
-        kong.log.debug("======================== ACHOU PORRAAAA")
-        return limit
-      end
-  end
-
-end
 
 local function get_usage(conf, identifier, current_timestamp, limits)
   local usage = {}
   local stop
 
-  for period, quota in pairs(limits) do
-    -- aqui cada period é segundo,minuto/hora, etc
-    kong.log.debug("======================== period: "..period)
-    local limit = get_quota_limit(conf, quota)
-    if limit then
+  for period, limit in pairs(limits) do
+    local current_usage, err = policies[conf.policy].usage(conf, identifier, period, current_timestamp)
+    if err then
+      return nil, nil, err
+    end
 
-      local current_usage, err = policies[conf.policy].usage(conf, identifier, period, current_timestamp)
-      if err then
-        return nil, nil, err
-      end
+    -- What is the current usage for the configured limit name?
+    local remaining = limit - current_usage
 
-      -- What is the current usage for the configured limit name?
-      local remaining = limit - current_usage
+    -- Recording usage
+    usage[period] = {
+      limit = limit,
+      remaining = remaining,
+    }
 
-      -- Recording usage
-      usage[period] = {
-        limit = limit,
-        remaining = remaining,
-      }
-
-      if remaining <= 0 then
-        stop = period
-      end
+    if remaining <= 0 then
+      stop = period
     end
   end
 
@@ -178,12 +126,12 @@ function RateLimitingHandler:access(conf)
 
   -- Load current metric for configured period
   local limits = {
-    second = conf.quotas.second,
-    minute = conf.quotas.minute,
-    hour = conf.quotas.hour,
-    day = conf.quotas.day,
-    month = conf.quotas.month,
-    year = conf.quotas.year,
+    second = conf.second,
+    minute = conf.minute,
+    hour = conf.hour,
+    day = conf.day,
+    month = conf.month,
+    year = conf.year,
   }
 
   local usage, stop, err = get_usage(conf, identifier, current_timestamp, limits)

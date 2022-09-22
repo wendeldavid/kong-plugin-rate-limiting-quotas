@@ -6,11 +6,11 @@ local ORDERED_PERIODS = { "second", "minute", "hour", "day", "month", "year"}
 
 local function validate_periods_order(config)
   for i, lower_period in ipairs(ORDERED_PERIODS) do
-    local v1 = config[lower_period]
+    local v1 = config.quotas[lower_period]
     if type(v1) == "number" then
       for j = i + 1, #ORDERED_PERIODS do
         local upper_period = ORDERED_PERIODS[j]
-        local v2 = config[upper_period]
+        local v2 = config.quotas[upper_period]
         if type(v2) == "number" and v2 < v1 then
           return nil, string.format("The limit for %s(%.1f) cannot be lower than the limit for %s(%.1f)",
                                     upper_period, v2, lower_period, v1)
@@ -116,12 +116,12 @@ return {
     { config = {
         type = "record",
         fields = {
-          { second = { type = "number", gt = 0 }, },
-          { minute = { type = "number", gt = 0 }, },
-          { hour = { type = "number", gt = 0 }, },
-          { day = { type = "number", gt = 0 }, },
-          { month = { type = "number", gt = 0 }, },
-          { year = { type = "number", gt = 0 }, },
+          -- { second = { type = "number", gt = 0 }, },
+          -- { minute = { type = "number", gt = 0 }, },
+          -- { hour = { type = "number", gt = 0 }, },
+          -- { day = { type = "number", gt = 0 }, },
+          -- { month = { type = "number", gt = 0 }, },
+          -- { year = { type = "number", gt = 0 }, },
           { limit_by = {
               type = "string",
               default = "consumer",
@@ -148,7 +148,10 @@ return {
     },
   },
   entity_checks = {
-    { at_least_one_of = { "config.second", "config.minute", "config.hour", "config.day", "config.month", "config.year" } },
+    { at_least_one_of = { 
+      -- "config.second", "config.minute", "config.hour", "config.day", "config.month", "config.year",
+      "config.quotas.second", "config.quotas.minute", "config.quotas.hour", "config.quotas.day", "config.quotas.month", "config.quotas.year" 
+    } },
     { conditional = {
       if_field = "config.policy", if_match = { eq = "redis" },
       then_field = "config.redis_host", then_match = { required = true },
