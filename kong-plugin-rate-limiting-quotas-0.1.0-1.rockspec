@@ -3,9 +3,9 @@ local package_name = "kong-plugin-" .. plugin_name
 local package_version = "0.1.0"
 local rockspec_revision = "1"
 
-local github_account_name = "Kong"
+local github_account_name = "wendeldavid"
 local github_repo_name = "kong-plugin"..plugin_name
-local git_checkout = package_version == "dev" and "master" or package_version
+local git_checkout = package_version == "dev" and "main" or package_version
 
 
 package = package_name

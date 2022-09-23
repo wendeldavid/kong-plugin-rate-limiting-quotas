@@ -1,5 +1,9 @@
 #!/bin/bash
 
-pongo run --no-cassandra -v
+KONG_DATABASE=postgres
+
+export KONG_DATABASE
+
+pongo run --no-cassandra -v -- --coverage
 
 pongo down
