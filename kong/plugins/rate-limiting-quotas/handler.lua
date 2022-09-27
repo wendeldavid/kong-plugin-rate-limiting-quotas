@@ -94,6 +94,10 @@ local function split_string (inputstr, sep)
 end
 
 local function get_quota_limit(conf, quota)
+  if not quota then
+    return nil
+  end
+
   -- pega o consumer da requisição
   local consumer = kong.client.get_consumer()
   if not consumer then
@@ -106,9 +110,6 @@ local function get_quota_limit(conf, quota)
     return nil, error(err)
   end
 
-  -- for k, v in pairs(consumer_groups) do
-  --   kong.log.debug("======================== "..k)
-  -- end
   for index, period_value in pairs(quota) do
       local splitted = split_string(period_value, ":")
       local plan = splitted[1]
@@ -133,7 +134,7 @@ local function get_usage(conf, identifier, current_timestamp, default_limits, qu
 
     -- aqui cada period é segundo,minuto,hora,etc
     kong.log.debug("======================== period: "..period)
-    local limit = get_quota_limit(conf, quota_limits.quotas[period])
+    local limit = get_quota_limit(conf, quota_limits[period])
 
     if not limit then
       limit = default_limit
