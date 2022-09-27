@@ -93,6 +93,7 @@ local function split_string (inputstr, sep)
   return t
 end
 
+
 local function get_quota_limit(conf, quota)
   -- pega o consumer da requisição
   local consumer = kong.client.get_consumer()
@@ -125,36 +126,33 @@ local function get_quota_limit(conf, quota)
 
 end
 
-local function get_usage(conf, identifier, current_timestamp, default_limits, quota_limits)
+local function get_usage(conf, identifier, current_timestamp, limits)
   local usage = {}
   local stop
 
-  for period, default_limit in pairs(default_limits) do
-
-    -- aqui cada period é segundo,minuto,hora,etc
+  for period, quota in pairs(limits) do
+    -- aqui cada period é segundo,minuto/hora, etc
     kong.log.debug("======================== period: "..period)
-    local limit = get_quota_limit(conf, quota_limits.quotas[period])
+    local limit = get_quota_limit(conf, quota)
+    if limit then
 
-    if not limit then
-      limit = default_limit
-    end
+      local current_usage, err = policies[conf.policy].usage(conf, identifier, period, current_timestamp)
+      if err then
+        return nil, nil, err
+      end
 
-    local current_usage, err = policies[conf.policy].usage(conf, identifier, period, current_timestamp)
-    if err then
-      return nil, nil, err
-    end
+      -- What is the current usage for the configured limit name?
+      local remaining = limit - current_usage
 
-    -- What is the current usage for the configured limit name?
-    local remaining = limit - current_usage
+      -- Recording usage
+      usage[period] = {
+        limit = limit,
+        remaining = remaining,
+      }
 
-    -- Recording usage
-    usage[period] = {
-      limit = limit,
-      remaining = remaining,
-    }
-
-    if remaining <= 0 then
-      stop = period
+      if remaining <= 0 then
+        stop = period
+      end
     end
   end
 
@@ -172,8 +170,6 @@ end
 
 
 function RateLimitingHandler:access(conf)
-  -- kong.log.inspect(conf)
-
   local current_timestamp = time() * 1000
 
   -- Consumer is identified by ip address or authenticated_credential id
@@ -181,15 +177,7 @@ function RateLimitingHandler:access(conf)
   local fault_tolerant = conf.fault_tolerant
 
   -- Load current metric for configured period
-  local default_limits = {
-    second = conf.second,
-    minute = conf.minute,
-    hour = conf.hour,
-    day = conf.day,
-    month = conf.month,
-    year = conf.year,
-  }
-  local quota_limits = {
+  local limits = {
     second = conf.quotas.second,
     minute = conf.quotas.minute,
     hour = conf.quotas.hour,
@@ -198,7 +186,7 @@ function RateLimitingHandler:access(conf)
     year = conf.quotas.year,
   }
 
-  local usage, stop, err = get_usage(conf, identifier, current_timestamp, default_limits, quota_limits)
+  local usage, stop, err = get_usage(conf, identifier, current_timestamp, limits)
   if err then
     if not fault_tolerant then
       return error(err)

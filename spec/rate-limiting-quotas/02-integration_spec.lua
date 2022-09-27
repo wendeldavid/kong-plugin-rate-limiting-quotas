@@ -36,8 +36,9 @@ for _, strategy in helpers.each_strategy() do
           name = PLUGIN_NAME,
           route = { id = route1.id },
           config = {
-            quotas = { 
-              minute = { "silver:10" }
+            second = 10,
+            quotas = {
+              minute = { "silver:60" }
             }
           },
         }
@@ -99,8 +100,11 @@ for _, strategy in helpers.each_strategy() do
           -- validate the value of that header
           assert.equal("10", rate_limit_header)
 
-          local rate_limit_period_header = assert.response(r).has.header("X-RateLimit-Limit-Quotas-Minute")
-          assert.equal("10", rate_limit_period_header)
+          local rate_limit_second_period_header = assert.response(r).has.header("X-RateLimit-Limit-Quotas-Second")
+          assert.equal("10", rate_limit_second_period_header)
+
+          local rate_limit_minute_period_header = assert.response(r).has.header("X-RateLimit-Limit-Quotas-Minute")
+          assert.equal("60", rate_limit_minute_period_header)
         end)
       end)
 

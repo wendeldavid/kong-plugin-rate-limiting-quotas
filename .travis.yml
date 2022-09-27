@@ -1,0 +1,27 @@
+dist: focal
+
+jobs:
+  include:
+  - name: Kong CE 2.3.x
+    env: KONG_VERSION=2.3.x
+  - name: Kong CE 2.4.x
+    env: KONG_VERSION=2.4.x
+  - name: Kong CE master
+    env: KONG_VERSION=nightly POSTGRES=latest CASSANDRA=latest
+
+install:
+- git clone --single-branch https://github.com/Kong/kong-pongo ../kong-pongo
+- "../kong-pongo/pongo.sh up"
+- "../kong-pongo/pongo.sh build"
+
+script:
+- "../kong-pongo/pongo.sh lint"
+- "../kong-pongo/pongo.sh run"
+
+# notifications:
+#   slack:
+#     if: branch = main AND type != pull_request
+#     on_success: change
+#     on_failure: always
+#     rooms:
+#       secure: <TOKEN>

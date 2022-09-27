@@ -6,11 +6,11 @@ local ORDERED_PERIODS = { "second", "minute", "hour", "day", "month", "year"}
 
 local function validate_periods_order(config)
   for i, lower_period in ipairs(ORDERED_PERIODS) do
-    local v1 = config.quotas[lower_period]
+    local v1 = config[lower_period]
     if type(v1) == "number" then
       for j = i + 1, #ORDERED_PERIODS do
         local upper_period = ORDERED_PERIODS[j]
-        local v2 = config.quotas[upper_period]
+        local v2 = config[upper_period]
         if type(v2) == "number" and v2 < v1 then
           return nil, string.format("The limit for %s(%.1f) cannot be lower than the limit for %s(%.1f)",
                                     upper_period, v2, lower_period, v1)
@@ -22,6 +22,16 @@ local function validate_periods_order(config)
   return true
 end
 
+local function validate_quotas(pair)
+  local name, value = pair:match("^([^:]+):([0-9]+)$")
+
+
+
+  if name ~= nil and value ~= nil then
+    return true
+  end
+  return false
+end
 
 local function is_dbless()
   local _, database, role = pcall(function()
@@ -66,42 +76,54 @@ local quotas = {
     { second = {
       type = "array",
         elements = {
-          type = "string"
+          type = "string",
+          match = "^[^:]+:.*$",
+          custom_validator = validate_quotas,
         }
       }
     },
     { minute = {
       type = "array",
         elements = {
-          type = "string"
+          type = "string",
+          match = "^[^:]+:.*$",
+          custom_validator = validate_quotas,
         }
       }
     },
     { hour = {
       type = "array",
         elements = {
-          type = "string"
+          type = "string",
+          match = "^[^:]+:.*$",
+          custom_validator = validate_quotas,
         }
       }
     },
     { day = {
       type = "array",
         elements = {
-          type = "string"
+          type = "string",
+          match = "^[^:]+:.*$",
+          custom_validator = validate_quotas,
         }
       }
     },
     { month = {
       type = "array",
         elements = {
-          type = "string"
+          type = "string",
+          match = "^[^:]+:.*$",
+          custom_validator = validate_quotas,
         }
       }
     },
     { year = {
       type = "array",
         elements = {
-          type = "string"
+          type = "string",
+          match = "^[^:]+:.*$",
+          custom_validator = validate_quotas,
         }
       }
     },
@@ -116,12 +138,12 @@ return {
     { config = {
         type = "record",
         fields = {
-          -- { second = { type = "number", gt = 0 }, },
-          -- { minute = { type = "number", gt = 0 }, },
-          -- { hour = { type = "number", gt = 0 }, },
-          -- { day = { type = "number", gt = 0 }, },
-          -- { month = { type = "number", gt = 0 }, },
-          -- { year = { type = "number", gt = 0 }, },
+          { second = { type = "number", gt = 0 }, },
+          { minute = { type = "number", gt = 0 }, },
+          { hour = { type = "number", gt = 0 }, },
+          { day = { type = "number", gt = 0 }, },
+          { month = { type = "number", gt = 0 }, },
+          { year = { type = "number", gt = 0 }, },
           { limit_by = {
               type = "string",
               default = "consumer",
@@ -148,10 +170,41 @@ return {
     },
   },
   entity_checks = {
-    { at_least_one_of = { 
-      -- "config.second", "config.minute", "config.hour", "config.day", "config.month", "config.year",
-      "config.quotas.second", "config.quotas.minute", "config.quotas.hour", "config.quotas.day", "config.quotas.month", "config.quotas.year" 
-    } },
+    { at_least_one_of = { "config.second", "config.minute", "config.hour", "config.day", "config.month", "config.year" } },
+    { custom_entity_check = {
+      field_sources = {
+        "config.second", "config.minute", "config.hour", "config.day", "config.month", "config.year",
+        "config.quotas.second", "config.quotas.minute", "config.quotas.hour", "config.quotas.day", "config.quotas.month", "config.quotas.year"
+        },
+      fn = function(entity)
+          if not entity.config and not entity.config.quotas then
+            return true
+          end
+
+          if entity.config.quotas.second ~= ngx.null and entity.config.second == ngx.null then
+            return nil, "config.second is required"
+          end
+          if entity.config.quotas.minute ~= ngx.null and entity.config.minute == ngx.null then
+            return nil, "config.minute is required"
+          end
+          if entity.config.quotas.hour ~= ngx.null and entity.config.hour == ngx.null then
+            return nil, "config.hour is required"
+          end
+          if entity.config.quotas.day ~= ngx.null and entity.config.day == ngx.null then
+            return nil, "config.day is required"
+          end
+          if entity.config.quotas.month ~= ngx.null and entity.config.month == ngx.null then
+            return nil, "config.month is required"
+          end
+          if entity.config.quotas.year ~= ngx.null and entity.config.year == ngx.null then
+            return nil, "config.year is required"
+          end
+
+          return true
+        end
+      }
+    },
+
     { conditional = {
       if_field = "config.policy", if_match = { eq = "redis" },
       then_field = "config.redis_host", then_match = { required = true },

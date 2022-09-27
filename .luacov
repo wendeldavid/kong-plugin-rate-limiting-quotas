@@ -1,2 +1,8 @@
-reporter = "html"
-reportfile = "luacov.report.html"
+include = {
+   "%/kong%-plugin%/kong%/.+$",
+}
+
+statsfile = "/kong-plugin/luacov.stats.out"
+-- reporter = "html"
+reportfile = "/kong-plugin/luacov.report.out"
+runreport = true
