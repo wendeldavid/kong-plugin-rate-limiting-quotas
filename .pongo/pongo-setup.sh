@@ -1,1 +1,1 @@
-# luarocks install luacov
+luarocks install luacov

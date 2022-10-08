@@ -45,11 +45,11 @@ local X_RATELIMIT_REMAINING = {
 }
 
 
-local RateLimitingHandler = {}
+local RateLimitingQuotasHandler = {}
 
 
-RateLimitingHandler.VERSION = kong_meta.version
-RateLimitingHandler.PRIORITY = 910
+RateLimitingQuotasHandler.VERSION = kong_meta.version
+RateLimitingQuotasHandler.PRIORITY = 910
 
 
 local function get_identifier(conf)
@@ -172,7 +172,7 @@ local function increment(premature, conf, ...)
 end
 
 
-function RateLimitingHandler:access(conf)
+function RateLimitingQuotasHandler:access(conf)
   -- kong.log.inspect(conf)
 
   local current_timestamp = time() * 1000
@@ -270,4 +270,4 @@ function RateLimitingHandler:access(conf)
 end
 
 
-return RateLimitingHandler
+return RateLimitingQuotasHandler
