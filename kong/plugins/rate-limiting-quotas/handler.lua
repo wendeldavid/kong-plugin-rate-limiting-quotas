@@ -87,13 +87,22 @@ local function split_string (inputstr, sep)
 
   local t={}
   for str in string.gmatch(inputstr, "([^"..sep.."]+)") do
-          table.insert(t, str)
+    table.insert(t, str)
   end
 
   return t
 end
 
-local function get_quota_limit(conf, quota)
+local function all_of(collection, contains)
+  for i, v in ipairs(contains) do
+    if not collection[v] then
+      return false
+    end
+  end
+  return true
+end
+
+local function get_quota_limit(quota)
   if not quota then
     return nil
   end
@@ -101,7 +110,7 @@ local function get_quota_limit(conf, quota)
   -- pega o consumer da requisição
   local consumer = kong.client.get_consumer()
   if not consumer then
-    return nil, error("no consumer found")
+    return nil
   end
 
   -- pega os groups do consumer...por convenção os planos ficariam aqui (ex: silver, gold)
@@ -111,35 +120,28 @@ local function get_quota_limit(conf, quota)
   end
 
   for index, period_value in pairs(quota) do
-      local splitted = split_string(period_value, ":")
-      local plan = splitted[1]
-      local limit = splitted[2]
+    local splitted = split_string(period_value, ":")
+    local plans = splitted[1]
+    local limit = splitted[2]
 
-      kong.log.debug("========================  plan: "..plan)
-      kong.log.debug("======================== limit: "..limit)
+    plans = split_string(plans, ",")
 
-      if consumer_groups[plan] ~= nil then
-        kong.log.debug("======================== ACHOU PORRAAAA")
-        return limit
-      end
+    if all_of(consumer_groups, plans) then
+      return limit
+    end
   end
+
+  return nil
 
 end
 
-local function get_usage(conf, identifier, current_timestamp, default_limits, quota_limits)
+local function get_usage(conf, identifier, current_timestamp, limits)
   local usage = {}
   local stop
 
-  for period, default_limit in pairs(default_limits) do
+  for period, limit in pairs(limits) do
 
     -- aqui cada period é segundo,minuto,hora,etc
-    kong.log.debug("======================== period: "..period)
-    local limit = get_quota_limit(conf, quota_limits[period])
-
-    if not limit then
-      limit = default_limit
-    end
-
     local current_usage, err = policies[conf.policy].usage(conf, identifier, period, current_timestamp)
     if err then
       return nil, nil, err
@@ -171,6 +173,22 @@ local function increment(premature, conf, ...)
   policies[conf.policy].increment(conf, ...)
 end
 
+local function get_limits(conf, default_limits, quota_limits)
+  local limits = {}
+  for period, default_limit in pairs(default_limits) do
+
+    -- aqui cada period é segundo,minuto,hora,etc
+    local limit = get_quota_limit(quota_limits[period])
+
+    if not limit then
+      limit = default_limit
+    end
+
+    limits[period] = limit
+  end
+
+  return limits
+end
 
 function RateLimitingQuotasHandler:access(conf)
   -- kong.log.inspect(conf)
@@ -199,7 +217,9 @@ function RateLimitingQuotasHandler:access(conf)
     year = conf.quotas.year,
   }
 
-  local usage, stop, err = get_usage(conf, identifier, current_timestamp, default_limits, quota_limits)
+  local limits = get_limits(conf, default_limits, quota_limits)
+
+  local usage, stop, err = get_usage(conf, identifier, current_timestamp, limits)
   if err then
     if not fault_tolerant then
       return error(err)

@@ -72,8 +72,8 @@ describe(PLUGIN_NAME .. ": (schema)", function()
       second = 10,
       hour = 60,
       quotas = {
-        second = { "silver:10" , "gold:100" },
-        hour = { "silver:60" },
+        second = { "bronze,silver:10" , "gold:100" },
+        hour = { "bronze,silver:60" },
       }
     })
 

@@ -46,18 +46,26 @@ for _, strategy in helpers.each_strategy() do
           group = "silver",
           consumer = { id = consumer.id },
         }
+        bp.acls:insert {
+          group = "product",
+          consumer = { id = consumer.id },
+        }
 
         bp.plugins:insert {
           name = PLUGIN_NAME,
           route = { id = route1.id },
           config = {
-            second = 2,
-            minute = 10,
+            second = 20,
+            minute = 100,
+            hour = 1000,
+            year = 22000,
             policy = "redis",
             redis_host = helpers.redis_host,
             redis_port = 6379,
             quotas = {
-              minute = { "silver:60" }
+              minute = { "product,silver:10", "product,gold:20" },
+              hour = { "silver:60" },
+              year = { "nope:11000" },
             }
           },
         }
@@ -106,10 +114,16 @@ for _, strategy in helpers.each_strategy() do
           -- assert.equal("10", rate_limit_header)
 
           local rate_limit_second_period_header = assert.response(r).has.header("X-RateLimit-Limit-Quotas-Second")
-          assert.equal("2", rate_limit_second_period_header)
+          assert.equal("20", rate_limit_second_period_header)
 
           local rate_limit_minute_period_header = assert.response(r).has.header("X-RateLimit-Limit-Quotas-Minute")
-          assert.equal("60", rate_limit_minute_period_header)
+          assert.equal("10", rate_limit_minute_period_header)
+
+          local rate_limit_hour_period_header = assert.response(r).has.header("X-RateLimit-Limit-Quotas-Hour")
+          assert.equal("60", rate_limit_hour_period_header)
+
+          local rate_limit_year_period_header = assert.response(r).has.header("X-RateLimit-Limit-Quotas-Year")
+          assert.equal("22000", rate_limit_year_period_header)
         end)
       end)
 
