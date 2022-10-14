@@ -4,8 +4,8 @@ jobs:
   include:
   - name: Kong CE 2.3.x
     env: KONG_VERSION=2.3.x
-  - name: Kong CE 2.4.x
-    env: KONG_VERSION=2.4.x
+  - name: Kong CE 3.0.x
+    env: KONG_VERSION=3.0.x
   - name: Kong CE master
     env: KONG_VERSION=nightly POSTGRES=latest CASSANDRA=latest
 
