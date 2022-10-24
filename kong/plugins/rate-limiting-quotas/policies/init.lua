@@ -40,7 +40,7 @@ end
 local get_local_key = function(conf, identifier, period, period_date)
   local service_id, route_id = get_service_and_route_ids(conf)
 
-  return fmt("ratelimit:%s:%s:%s:%s:%s", route_id, service_id, identifier,
+  return fmt("ratelimitquotas:%s:%s:%s:%s:%s", route_id, service_id, identifier,
              period_date, period)
 end
 
@@ -67,7 +67,7 @@ local function get_redis_connection(conf)
                           conf.redis_port,
                           conf.redis_database)
   end
-  
+
   local ok, err = red:connect(conf.redis_host, conf.redis_port,
                               sock_opts)
   if not ok then
