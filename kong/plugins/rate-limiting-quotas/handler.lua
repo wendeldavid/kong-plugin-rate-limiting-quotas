@@ -169,7 +169,6 @@ local function increment(premature, conf, ...)
   if premature then
     return
   end
-
   policies[conf.policy].increment(conf, ...)
 end
 

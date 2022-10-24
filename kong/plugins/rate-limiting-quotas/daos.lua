@@ -1,6 +1,6 @@
 return {
     {
-      name               = "ratelimiting_quotas_metrics",
+      name               = "ratelimitingquotas_metrics",
       primary_key        = { "identifier", "period", "period_date", "service_id", "route_id" },
       generate_admin_api = false,
       ttl                = true,
@@ -49,4 +49,3 @@ return {
       },
     },
   }
-  

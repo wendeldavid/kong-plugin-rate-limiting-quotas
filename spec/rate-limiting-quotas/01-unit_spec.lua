@@ -1,8 +1,5 @@
 local PLUGIN_NAME = "rate-limiting-quotas"
 
-local inspect = require "inspect"
-
-
 -- helper function to validate data against a schema
 local validate do
   local validate_entity = require("spec.helpers").validate_plugin_config_schema
@@ -15,7 +12,6 @@ end
 
 
 describe(PLUGIN_NAME .. ": (schema)", function()
-
 
   it("without values", function()
     local ok, err = validate({})

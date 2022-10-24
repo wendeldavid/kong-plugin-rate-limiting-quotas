@@ -3,7 +3,6 @@ local timestamp = require "kong.tools.timestamp"
 
 local kong = kong
 local concat = table.concat
-local pairs = pairs
 local ipairs = ipairs
 local floor = math.floor
 local fmt = string.format
@@ -27,7 +26,7 @@ do
       find_pk.service_id  = service_id
       find_pk.route_id    = route_id
 
-      return kong.db.ratelimiting_metrics:select(find_pk)
+      return kong.db.ratelimitingquotas_metrics:select(find_pk)
   end
 end
 
@@ -38,15 +37,14 @@ return {
       local buf = { "BEGIN" }
       local len = 1
       local periods = timestamp.get_timestamps(current_timestamp)
-      for _, period in ipairs(timestamp.timestamp_table_fields) do
-        local period_date = periods[period]
+      for period, period_date in pairs(periods) do
         if limits[period] then
           len = len + 1
           buf[len] = fmt([[
             INSERT INTO "ratelimitingquotas_metrics" ("identifier", "period", "period_date", "service_id", "route_id", "value", "ttl")
                  VALUES (%s, %s, TO_TIMESTAMP(%s) AT TIME ZONE 'UTC', %s, %s, %s, CURRENT_TIMESTAMP AT TIME ZONE 'UTC' + INTERVAL %s)
             ON CONFLICT ("identifier", "period", "period_date", "service_id", "route_id") DO UPDATE
-                    SET "value" = "ratelimiting_metrics"."value" + EXCLUDED."value"
+                    SET "value" = "ratelimitingquotas_metrics"."value" + EXCLUDED."value"
           ]],
             connector:escape_literal(identifier),
             connector:escape_literal(period),

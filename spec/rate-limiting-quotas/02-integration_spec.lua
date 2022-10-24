@@ -109,7 +109,7 @@ for _, strategy in helpers.each_strategy() do
           -- now check the request (as echoed by mockbin) to have the header
           local rate_limit_header = assert.response(r).has.header("RateLimit-Limit-Quotas")
           -- validate the value of that header
-          -- assert.equal("10", rate_limit_header)
+          assert.equal("10", rate_limit_header)
 
           local rate_limit_second_period_header = assert.response(r).has.header("X-RateLimit-Limit-Quotas-Second")
           assert.equal("20", rate_limit_second_period_header)

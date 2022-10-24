@@ -3,6 +3,5 @@ include = {
 }
 
 statsfile = "/kong-plugin/luacov.stats.out"
-reportfile = "/kong-plugin/luacov.report.out"
 runreport = true
--- reporter = "html"
+reportfile = "/kong-plugin/luacov.report.out"
