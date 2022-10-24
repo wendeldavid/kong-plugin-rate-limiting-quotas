@@ -61,7 +61,7 @@ The plugin will not work with the `cluster` policy, which requires writes to the
 | `config.redis_timeout` | When using the `redis` policy, this property specifies the timeout in milliseconds of any command submitted to the Redis server | number | false | `2000` |
 | `config.redis_database` | When using the `redis` policy, this property specifies the Redis database to use | integer | false | `0` |
 
-**Note** At least one limit (`second`, `minute`, `hour`, `day`, `month`, `year`) must be configured. Multiple limits can be configured.
+> **Note**: At least one limit (`second`, `minute`, `hour`, `day`, `month`, `year`) must be configured. Multiple limits can be configured.
 
 ---
 
@@ -99,7 +99,7 @@ When a limit is reached, the plugin returns an `HTTP/1.1 429` status code, with 
 { "message": "API rate limit exceeded" }
 ```
 
-{:.warning}
+
 > **Warning**: The headers `RateLimit-Limit`, `RateLimit-Remaining`, and `RateLimit-Reset` are based on the Internet-Draft [RateLimit Header Fields for HTTP](https://tools.ietf.org/html/draft-polli-ratelimit-headers-01). These could change if the specification is updated.
 
 ## Implementation considerations
