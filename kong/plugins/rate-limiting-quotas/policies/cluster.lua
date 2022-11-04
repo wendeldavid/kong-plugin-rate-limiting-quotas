@@ -3,7 +3,6 @@ local timestamp = require "kong.tools.timestamp"
 
 local kong = kong
 local concat = table.concat
-local ipairs = ipairs
 local floor = math.floor
 local fmt = string.format
 local tonumber = tonumber
