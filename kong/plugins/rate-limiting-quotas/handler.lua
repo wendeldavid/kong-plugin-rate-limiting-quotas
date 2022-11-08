@@ -80,7 +80,7 @@ local function get_identifier(conf)
   return identifier or kong.client.get_forwarded_ip()
 end
 
-local function split_string (inputstr, sep)
+local function split_string(inputstr, sep)
   if sep == nil then
     sep = "%s"
   end
@@ -119,6 +119,8 @@ local function get_quota_limit(quota)
     return nil, error(err)
   end
 
+  local matched_limits = {}
+
   for index, period_value in pairs(quota) do
     local splitted = split_string(period_value, ":")
     local plans = splitted[1]
@@ -127,12 +129,15 @@ local function get_quota_limit(quota)
     plans = split_string(plans, ",")
 
     if all_of(consumer_groups, plans) then
-      return limit
+      table.insert(matched_limits, tonumber(limit))
     end
   end
 
-  return nil
-
+  -- if table not empty, return greatest limit of all matched quotas
+  if next(matched_limits) == nil then
+    return nil
+  end
+  return math.max(unpack(matched_limits))
 end
 
 local function get_usage(conf, identifier, current_timestamp, limits)

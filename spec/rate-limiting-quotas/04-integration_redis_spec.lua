@@ -23,13 +23,21 @@ for _, strategy in helpers.each_strategy() do
         -- Inject a test route. No need to create a service, there is a default
         -- service which will echo the request.
         local route1 = bp.routes:insert({
-          paths = { "/request_test" }
+          paths = { "/request_test1" }
+        })
+        local route2 = bp.routes:insert({
+          paths = { "/request_test2" }
         })
 
         -- add the plugin to test to the route we created
         bp.plugins:insert {
           name = "key-auth",
           route = { id = route1.id },
+          config = {},
+        }
+        bp.plugins:insert {
+          name = "key-auth",
+          route = { id = route2.id },
           config = {},
         }
 
@@ -70,6 +78,18 @@ for _, strategy in helpers.each_strategy() do
           },
         }
 
+        bp.plugins:insert {
+          name = PLUGIN_NAME,
+          route = { id = route2.id },
+          config = {
+            minute = 100,
+            policy = "local",
+            quotas = {
+              minute = { "silver:10", "product:20" },
+            }
+          },
+        }
+
         -- start kong
         assert(helpers.start_kong({
           -- set the strategy
@@ -97,7 +117,7 @@ for _, strategy in helpers.each_strategy() do
 
       describe("request", function()
         it("made one request", function()
-          local r = client:get("/request_test", {
+          local r = client:get("/request_test1", {
             headers = {
               apikey = "key-test"
             }
@@ -127,6 +147,28 @@ for _, strategy in helpers.each_strategy() do
         end)
       end)
 
+      describe("request_2", function()
+        it("request conflict quotas", function()
+          local r = client:get("/request_test2", {
+            headers = {
+              apikey = "key-test"
+            }
+          })
+          -- validate that the request succeeded, response status 200
+          assert.response(r).has.status(200)
+
+          local consumer_header = assert.request(r).has.header("x-consumer-username")
+          assert.equal("consumer_name", consumer_header)
+
+          -- now check the request (as echoed by mockbin) to have the header
+          local rate_limit_header = assert.response(r).has.header("RateLimit-Limit-Quotas")
+          -- validate the value of that header
+          assert.equal("20", rate_limit_header)
+
+          local rate_limit_minute_period_header = assert.response(r).has.header("X-RateLimit-Limit-Quotas-Minute")
+          assert.equal("20", rate_limit_minute_period_header)
+        end)
+      end)
 
     end)
   end --cassandra if gambeta
