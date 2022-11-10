@@ -1,0 +1,42 @@
+version: 2.1
+jobs:
+  build:
+    docker:
+      - image: cimg/base:2022.09
+    resource_class: large
+    steps:
+      - setup_remote_docker:
+          version: 20.10.14
+      - checkout
+      - run:
+          name: Setup
+          command: |
+            echo "======= setup environment"
+            apt-get update && apt-get install -y git
+            git clone --single-branch https://github.com/Kong/kong-pongo ../kong-pongo
+            chmod 777 ../kong-pongo/pongo.sh
+            ../kong-pongo/pongo.sh up
+      - run:
+          name: Build
+          command: |
+            echo "======= build plugin"
+            ../kong-pongo/pongo.sh build
+      - run:
+          name: Lint
+          command: |
+            echo "====== run lint in code"
+            ls -hal
+            ../kong-pongo/pongo.sh lint
+      # - run:
+      #     name: Tests
+      #     command: |
+      #       echo "====== run tests with coverage"
+      #       ls -hal
+      #       ../kong-pongo/pongo.sh up
+      #       ../kong-pongo/pongo.sh run -l --no-cassandra --no-redis -- --coverage
+      # - store_artifacts:
+      #     path: ./
+      #     destination: luacov.report.out
+      # - store_artifacts:
+      #     path: ./
+      #     destination: luacov.report.out
