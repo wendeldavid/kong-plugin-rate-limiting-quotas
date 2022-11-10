@@ -67,7 +67,7 @@ for _, strategy in helpers.each_strategy() do
             minute = 100,
             hour = 1000,
             year = 22000,
-            policy = "local",
+            policy = "cluster",
             quotas = {
               minute = { "product,silver:10", "product,gold:20" },
               hour = { "silver:60" },
@@ -113,8 +113,8 @@ for _, strategy in helpers.each_strategy() do
         if client then client:close() end
       end)
 
-      describe("request_1", function()
-        it("request with multiples limits", function()
+      describe("request", function()
+        it("made one request", function()
           local r = client:get("/request_test1", {
             headers = {
               apikey = "key-test"
@@ -167,7 +167,6 @@ for _, strategy in helpers.each_strategy() do
           assert.equal("20", rate_limit_minute_period_header)
         end)
       end)
-
 
     end)
   end --cassandra if gambeta
