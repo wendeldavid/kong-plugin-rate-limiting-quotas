@@ -9,7 +9,7 @@ return {
         END$$;
         DO $$
         BEGIN
-          CREATE INDEX IF NOT EXISTS "ratelimiting_metricsquoats_ttl_idx" ON "ratelimitingquotas_metrics" ("ttl");
+          CREATE INDEX IF NOT EXISTS "ratelimitingquotas_metrics_ttl_idx" ON "ratelimitingquotas_metrics" ("ttl");
         EXCEPTION WHEN UNDEFINED_TABLE THEN
           -- Do nothing, accept existing state
         END$$;
