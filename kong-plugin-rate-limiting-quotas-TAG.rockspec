@@ -1,7 +1,6 @@
 local plugin_name = "rate-limiting-quotas"
 local package_name = "kong-plugin-" .. plugin_name
 local package_version = "${TAG}"
-local rockspec_revision = "1"
 
 local github_account_name = "wendeldavid"
 local github_repo_name = "kong-plugin-"..plugin_name
@@ -9,7 +8,7 @@ local git_checkout = package_version == "dev" and "main" or package_version
 
 
 package = package_name
-version = package_version .. "-" .. rockspec_revision
+version = package_version
 supported_platforms = { "linux", "macosx" }
 source = {
   url = "git+https://github.com/"..github_account_name.."/"..github_repo_name..".git",
