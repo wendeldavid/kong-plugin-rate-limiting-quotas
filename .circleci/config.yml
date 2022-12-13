@@ -48,7 +48,7 @@ jobs:
       - run:
           name: Setup luarocks
           command: |
-            apt-get install luarocks
+            sudo apt-get install luarocks
       - run:
           name: Publish
           command: |
