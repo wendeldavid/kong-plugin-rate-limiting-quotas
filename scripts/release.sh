@@ -12,9 +12,9 @@ git merge dev
 
 echo "update artifacts"
 
-sed -i "s|\${TAG}|$1|g" kong-plugin-rate-limiting-quotas-TAG-1.rockspec
+sed -i "s|\${TAG}|$1|g" kong-plugin-rate-limiting-quotas-TAG.rockspec
 
-mv kong-plugin-rate-limiting-quotas-TAG-1.rockspec kong-plugin-rate-limiting-quotas-$1-1.rockspec
+mv kong-plugin-rate-limiting-quotas-TAG.rockspec kong-plugin-rate-limiting-quotas-$1.rockspec
 
 echo "release version started"
 
