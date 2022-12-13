@@ -54,6 +54,7 @@ jobs:
           name: Publish
           command: |
             echo "====== publish plugin version ${CIRCLE_TAG}"
+            sed -i "s|\${TAG}|$1|g" kong-plugin-rate-limiting-quotas-${CIRCLE_TAG}-1.rockspec
             luarocks upload kong-plugin-rate-limiting-quotas-TAG-1.rockspec --api-key ${LUAROCKS_KEY}
 # luarocks upload kong-plugin-rate-limiting-quotas.${CIRCLE_TAG}.rockspec --api-key ${LUAROCKS_KEY}
 workflows:
