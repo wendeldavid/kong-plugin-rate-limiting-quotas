@@ -1,0 +1,75 @@
+version: 2.1
+
+jobs:
+  build-plugin:
+    docker:
+      - image: cimg/base:2022.09
+    resource_class: large
+    steps:
+      - setup_remote_docker:
+          version: 20.10.14
+      - checkout
+      - run:
+          name: Setup pongo
+          command: |
+            echo "======= setup environment"
+            apt-get update && apt-get install -y git
+            git clone --single-branch https://github.com/Kong/kong-pongo ../kong-pongo
+            chmod 777 ../kong-pongo/pongo.sh
+            ../kong-pongo/pongo.sh up
+      - run:
+          name: Build
+          command: |
+            echo "======= build plugin"
+            ../kong-pongo/pongo.sh build
+      - run:
+          name: Lint
+          command: |
+            echo "====== run lint in code"
+            ls -hal
+            ../kong-pongo/pongo.sh lint
+      # - run:
+      #     name: Tests
+      #     command: |
+      #       echo "====== run tests with coverage"
+      #       ls -hal
+      #       ../kong-pongo/pongo.sh up
+      #       ../kong-pongo/pongo.sh run -l --no-cassandra --no-redis -- --coverage
+      # - store_artifacts:
+      #     path: ./
+      #     destination: luacov.report.out
+      # - store_artifacts:
+      #     path: ./
+      #     destination: luacov.report.out
+  deploy-plugin:
+    docker:
+      - image: cimg/base:2022.09
+    steps:
+      - run:
+          name: Setup luarocks
+          command: |
+            sudo apt-get update && sudo apt-get install luarocks -f
+            luarocks install lua-cjson --local
+      - checkout
+      - run:
+          name: Publish
+          command: |
+            echo "====== publish plugin version ${CIRCLE_TAG}"
+            sed -i "s|\${TAG}|${CIRCLE_TAG}|g" kong-plugin-rate-limiting-quotas-TAG-1.rockspec
+            mv kong-plugin-rate-limiting-quotas-TAG-1.rockspec kong-plugin-rate-limiting-quotas-${CIRCLE_TAG}-1.rockspec
+            luarocks upload --api-key ${LUAROCKS_KEY} kong-plugin-rate-limiting-quotas-${CIRCLE_TAG}-1.rockspec
+# luarocks upload kong-plugin-rate-limiting-quotas.${CIRCLE_TAG}.rockspec --api-key ${LUAROCKS_KEY}
+workflows:
+  version: 2
+  build:
+    jobs:
+      - build-plugin:
+          filters:
+            branches:
+              only: /.*/
+      - deploy-plugin:
+          filters:
+            branches:
+              ignore: /.*/
+            tags:
+              only: /.*/
