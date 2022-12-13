@@ -9,7 +9,7 @@ jobs:
           version: 20.10.14
       - checkout
       - run:
-          name: Setup
+          name: Setup pongo
           command: |
             echo "======= setup environment"
             apt-get update && apt-get install -y git
@@ -41,9 +41,9 @@ jobs:
       #     path: ./
       #     destination: luacov.report.out
       - run:
-          name: Deploy
+          name: Publish
           command: |
-            echo "====== run lint in code"
+            echo "====== publish plugin version ${CIRCLE_TAG}"
             luarocks upload kong-plugin-rate-limiting-quotas.${CIRCLE_TAG}.rockspec --api-key ${LUAROCKS_KEY}
 workflows:
   version: 2
