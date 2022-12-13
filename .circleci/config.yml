@@ -40,3 +40,18 @@ jobs:
       # - store_artifacts:
       #     path: ./
       #     destination: luacov.report.out
+      - run:
+          name: Deploy
+          command: |
+            echo "====== run lint in code"
+            luarocks upload kong-plugin-rate-limiting-quotas.${CIRCLE_TAG}.rockspec --api-key ${LUAROCKS_KEY}
+workflows:
+  version: 2
+  build:
+    jobs:
+      - build:
+        filters:
+          branches:
+            ignore: /.*/
+          tags:
+            only: /.*/
