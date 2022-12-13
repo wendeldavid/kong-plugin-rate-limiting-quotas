@@ -49,7 +49,7 @@ jobs:
           name: Setup luarocks
           command: |
             sudo apt-get update && sudo apt-get install luarocks -f
-            luarocks install cjson --local
+            luarocks install lua-cjson --local
       - checkout
       - run:
           name: Publish
