@@ -60,11 +60,12 @@ workflows:
   build:
     jobs:
       - build-plugin:
-        filters:
-          branches:
-            only: /.*/
+          filters:
+            branches:
+              only: /.*/
       - deploy-plugin:
-          branches:
-            ignore: /.*/
-          tags:
-            only: /.*/
+          filters:
+            branches:
+              ignore: /.*/
+            tags:
+              only: /.*/
