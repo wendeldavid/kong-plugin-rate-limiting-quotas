@@ -2,8 +2,6 @@
 
 [ $# -eq 1 ] || exit 1
 
-cd ..
-
 echo "start gitflow release"
 
 git checkout main
