@@ -128,7 +128,7 @@ local function get_quota_limit(quota)
 
     plans = split_string(plans, ",")
 
-    if all_of(consumer_groups, plans) then
+    if consumer_groups ~= nil and all_of(consumer_groups, plans) then
       table.insert(matched_limits, tonumber(limit))
     end
   end
