@@ -16,7 +16,7 @@ mv kong-plugin-rate-limiting-quotas-TAG-1.rockspec kong-plugin-rate-limiting-quo
 
 echo "release version started"
 
-git add *
+git add .
 
 git commit -m "release new plugin version: $1"
 
