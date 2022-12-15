@@ -65,6 +65,37 @@ The plugin will not work with the `cluster` policy, which requires writes to the
 
 ---
 
+### JSON config format
+```json
+{
+  "name": "rate-limiting-quotas",
+  "enabled": true,
+  "service": null,
+  "route": {
+    "id": "ffe7f02a-654b-411f-b625-351113ca2148"
+  },
+  "config": {
+    "fault_tolerant": true,
+    "quotas": {
+      "minute": [ "plus:5", "enterprise:10" ],
+      "hour": null,
+      "day": null,
+      "month": null,
+      "year": null,
+      "second": null
+    },
+    "minute": 3,
+    "hour": 60,
+    "day": null,
+    "month": null,
+    "year": null,
+    "limit_by": "consumer"
+  }
+}
+```
+
+---
+
 ## Headers sent to the client
 
 When this plugin is enabled, Kong sends additional headers
