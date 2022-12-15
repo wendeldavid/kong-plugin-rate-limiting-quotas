@@ -96,6 +96,17 @@ The plugin will not work with the `cluster` policy, which requires writes to the
 
 ---
 
+## How the limit is applied with quotas
+
+
+| consumer   |       ACLs       | rate-limiting default | rate-limiting-quotas          | limit applied |
+|------------|------------------|-----------------------|-------------------------------|---------------|
+| consumer 1 | pro              | minute=5              | pro.minute=10                 | 10 per minute |
+| consumer 2 | pro, enterprise  | minute=5              | pro.minute=10, enterprise=50  | 50 per minute |
+| consumer 3 | pro              | minute=5              | enterprise.minute=50          |  5 per minute |
+
+---
+
 ## Headers sent to the client
 
 When this plugin is enabled, Kong sends additional headers
