@@ -96,6 +96,33 @@ The plugin will not work with the `cluster` policy, which requires writes to the
 
 ---
 
+### decK config format
+```yaml
+    name: rate-limiting-quotas
+    enabled: true
+    - config:
+        day: null
+        fault_tolerant: true
+        hide_client_headers: false
+        hour: null
+        limit_by: consumer
+        minute: 10
+        policy: local
+        quotas:
+          day: null
+          hour: null
+          minute:
+          - plus:5
+          - enterprise:10
+          month: null
+          second: null
+          year: null
+        second: null
+        year: null
+```
+
+---
+
 ## How the limit is applied with quotas
 
 
