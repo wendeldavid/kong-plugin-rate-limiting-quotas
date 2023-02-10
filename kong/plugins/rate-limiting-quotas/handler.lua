@@ -20,28 +20,28 @@ local EMPTY = {}
 local EXPIRATION = require "kong.plugins.rate-limiting-quotas.expiration"
 
 
-local RATELIMIT_LIMIT     = "RateLimit-Limit-Quotas"
-local RATELIMIT_REMAINING = "RateLimit-Remaining-Quotas"
-local RATELIMIT_RESET     = "RateLimit-Reset-Quotas"
-local RETRY_AFTER         = "Retry-After-Quotas"
+local RATELIMIT_LIMIT     = "RateLimit-Limit"
+local RATELIMIT_REMAINING = "RateLimit-Remaining"
+local RATELIMIT_RESET     = "RateLimit-Reset"
+local RETRY_AFTER         = "Retry-After"
 
 
 local X_RATELIMIT_LIMIT = {
-  second = "X-RateLimit-Limit-Quotas-Second",
-  minute = "X-RateLimit-Limit-Quotas-Minute",
-  hour   = "X-RateLimit-Limit-Quotas-Hour",
-  day    = "X-RateLimit-Limit-Quotas-Day",
-  month  = "X-RateLimit-Limit-Quotas-Month",
-  year   = "X-RateLimit-Limit-Quotas-Year",
+  second = "X-RateLimit-Limit-Second",
+  minute = "X-RateLimit-Limit-Minute",
+  hour   = "X-RateLimit-Limit-Hour",
+  day    = "X-RateLimit-Limit-Day",
+  month  = "X-RateLimit-Limit-Month",
+  year   = "X-RateLimit-Limit-Year",
 }
 
 local X_RATELIMIT_REMAINING = {
-  second = "X-RateLimit-Remaining-Quotas-Second",
-  minute = "X-RateLimit-Remaining-Quotas-Minute",
-  hour   = "X-RateLimit-Remaining-Quotas-Hour",
-  day    = "X-RateLimit-Remaining-Quotas-Day",
-  month  = "X-RateLimit-Remaining-Quotas-Month",
-  year   = "X-RateLimit-Remaining-Quotas-Year",
+  second = "X-RateLimit-Remaining-Second",
+  minute = "X-RateLimit-Remaining-Minute",
+  hour   = "X-RateLimit-Remaining-Hour",
+  day    = "X-RateLimit-Remaining-Day",
+  month  = "X-RateLimit-Remaining-Month",
+  year   = "X-RateLimit-Remaining-Year",
 }
 
 
