@@ -7,7 +7,7 @@ jobs:
   - name: Kong CE 3.0.x
     env: KONG_VERSION=3.0.x
   - name: Kong CE master
-    env: KONG_VERSION=nightly POSTGRES=latest CASSANDRA=latest
+    env: KONG_VERSION=nightly POSTGRES=latest
 
 install:
 - git clone --single-branch https://github.com/Kong/kong-pongo ../kong-pongo

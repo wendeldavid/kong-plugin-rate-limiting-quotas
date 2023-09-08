@@ -5,7 +5,6 @@ local PLUGIN_NAME = "rate-limiting-quotas"
 
 
 for _, strategy in helpers.each_strategy() do
-  if strategy ~= "cassandra" then
     describe(PLUGIN_NAME .. ": (access) [#" .. strategy .. "]", function()
       local client
 
@@ -127,20 +126,20 @@ for _, strategy in helpers.each_strategy() do
           assert.equal("consumer_name", consumer_header)
 
           -- now check the request (as echoed by mockbin) to have the header
-          local rate_limit_header = assert.response(r).has.header("RateLimit-Limit-Quotas")
+          local rate_limit_header = assert.response(r).has.header("RateLimit-Limit")
           -- validate the value of that header
           assert.equal("10", rate_limit_header)
 
-          local rate_limit_second_period_header = assert.response(r).has.header("X-RateLimit-Limit-Quotas-Second")
+          local rate_limit_second_period_header = assert.response(r).has.header("X-RateLimit-Limit-Second")
           assert.equal("20", rate_limit_second_period_header)
 
-          local rate_limit_minute_period_header = assert.response(r).has.header("X-RateLimit-Limit-Quotas-Minute")
+          local rate_limit_minute_period_header = assert.response(r).has.header("X-RateLimit-Limit-Minute")
           assert.equal("10", rate_limit_minute_period_header)
 
-          local rate_limit_hour_period_header = assert.response(r).has.header("X-RateLimit-Limit-Quotas-Hour")
+          local rate_limit_hour_period_header = assert.response(r).has.header("X-RateLimit-Limit-Hour")
           assert.equal("60", rate_limit_hour_period_header)
 
-          local rate_limit_year_period_header = assert.response(r).has.header("X-RateLimit-Limit-Quotas-Year")
+          local rate_limit_year_period_header = assert.response(r).has.header("X-RateLimit-Limit-Year")
           assert.equal("22000", rate_limit_year_period_header)
         end)
       end)
@@ -159,15 +158,14 @@ for _, strategy in helpers.each_strategy() do
           assert.equal("consumer_name", consumer_header)
 
           -- now check the request (as echoed by mockbin) to have the header
-          local rate_limit_header = assert.response(r).has.header("RateLimit-Limit-Quotas")
+          local rate_limit_header = assert.response(r).has.header("RateLimit-Limit")
           -- validate the value of that header
           assert.equal("20", rate_limit_header)
 
-          local rate_limit_minute_period_header = assert.response(r).has.header("X-RateLimit-Limit-Quotas-Minute")
+          local rate_limit_minute_period_header = assert.response(r).has.header("X-RateLimit-Limit-Minute")
           assert.equal("20", rate_limit_minute_period_header)
         end)
       end)
 
     end)
-  end --cassandra if gambeta
 end

@@ -8,14 +8,9 @@ return {
           "service_id"   UUID                         NOT NULL DEFAULT '00000000-0000-0000-0000-000000000000'::UUID,
           "route_id"     UUID                         NOT NULL DEFAULT '00000000-0000-0000-0000-000000000000'::UUID,
           "value"        INTEGER,
-  
+
           PRIMARY KEY ("identifier", "period", "period_date", "service_id", "route_id")
         );
-      ]],
-    },
-
-    cassandra = {
-      up = [[
       ]],
     },
   }

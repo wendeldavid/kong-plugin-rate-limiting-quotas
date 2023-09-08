@@ -33,7 +33,7 @@ jobs:
       #       echo "====== run tests with coverage"
       #       ls -hal
       #       ../kong-pongo/pongo.sh up
-      #       ../kong-pongo/pongo.sh run -l --no-cassandra --no-redis -- --coverage
+      #       ../kong-pongo/pongo.sh run -l --no-redis -- --coverage
       # - store_artifacts:
       #     path: ./
       #     destination: luacov.report.out
