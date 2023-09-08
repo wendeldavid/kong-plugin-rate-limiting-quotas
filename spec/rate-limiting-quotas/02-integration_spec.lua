@@ -5,7 +5,6 @@ local PLUGIN_NAME = "rate-limiting-quotas"
 
 
 for _, strategy in helpers.each_strategy() do
-  if strategy ~= "cassandra" then
     describe(PLUGIN_NAME .. ": (access) [#" .. strategy .. "]", function()
       local client
 
@@ -170,5 +169,4 @@ for _, strategy in helpers.each_strategy() do
 
 
     end)
-  end --cassandra if gambeta
 end
