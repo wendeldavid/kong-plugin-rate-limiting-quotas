@@ -221,12 +221,3 @@ inaccuracies and preventing scaling problems.
 When the selected policy cannot be retrieved, the plugin falls back
 to limiting usage by identifying the IP address. This can happen for several reasons, such as the
 selected header was not sent by the client or the configured service was not found.
-
----
-
-## Changelog
-
-**1.0.0**
-
-* Forked from original `rate-limiting` plugin
-* Added configuration to quotas the limit from consumer ACL group

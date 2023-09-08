@@ -1,6 +1,7 @@
 # 1.0.0
 
-* Official release
+* Forked from original `rate-limiting` plugin
+* Added configuration to quotas the limit from consumer ACL group
 
 # 1.0.1
 
